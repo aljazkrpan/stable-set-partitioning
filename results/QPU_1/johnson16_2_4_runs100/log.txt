@@ -1,3 +1,17 @@
+Partition  1: beta=1 || solution energy: -6.0 || number of edges in solution: 1 || solution size: 8
+Partition  2: beta=1 || solution energy: -5.0 || number of edges in solution: 1 || solution size: 7
+Partition  3: beta=1 || solution energy: -6.0 || number of edges in solution: 0 || solution size: 6
+Partition  4: beta=1 || solution energy: -6.0 || number of edges in solution: 0 || solution size: 6
+Partition  5: beta=1 || solution energy: -6.0 || number of edges in solution: 0 || solution size: 6
+Partition  6: beta=1 || solution energy: -7.0 || number of edges in solution: 0 || solution size: 7
+Partition  7: beta=1 || solution energy: -6.0 || number of edges in solution: 1 || solution size: 8
+Partition  8: beta=1 || solution energy: -7.0 || number of edges in solution: 0 || solution size: 7
+Partition  9: beta=1 || solution energy: -6.0 || number of edges in solution: 0 || solution size: 6
+Partition 10: beta=1 || solution energy: -4.0 || number of edges in solution: 2 || solution size: 8
+Partition 11: beta=1 || solution energy: -5.0 || number of edges in solution: 1 || solution size: 7
+Partition 12: beta=1 || solution energy: -4.0 || number of edges in solution: 2 || solution size: 8
+Partition 13: beta=1 || solution energy: -4.0 || number of edges in solution: 2 || solution size: 8
+Partition 14: beta=1 || solution energy: -5.0 || number of edges in solution: 1 || solution size: 7
 Partition 15: beta=1 || solution energy: 0 || number of edges in solution: 0 || solution size: 0
 Partition 16: beta=1 || solution energy: -3.0 || number of edges in solution: 2 || solution size: 7
 Partition 17: beta=1 || solution energy: -6.0 || number of edges in solution: 0 || solution size: 6
