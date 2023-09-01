@@ -31,7 +31,7 @@ def create_networkx_graph(num_nodes, edges):
     G.add_edges_from(edges)
     return G
 
-# takes a pickeled file and returns the sample_set
+# takes a .pkl file and returns the sample_set
 def open_saved_sample_set(input_file):
     with open(input_file, 'rb') as file:
         sample_set = SampleSet.from_serializable(pickle.load(file))
@@ -104,7 +104,8 @@ def calculate_best_solution(
         output_file=None,
         no_output_file = False,
         console_output=True,
-        partition_with_halo_list=None
+        partition_with_halo_list=None,
+        generate_log_file=True
     ):
     # if we want to produce a file but the directory does not exist or is not given, throw an Exception,
     # otherwise we might waste computational resources and be left without the result
@@ -118,6 +119,9 @@ def calculate_best_solution(
     elif(partition_with_halo_list is None):
         partition_with_halo_list = [set(stable_set_graph.nodes)]
 
+    if(generate_log_file):
+        log_file = open(f"{os.path.dirname(output_file)}/log.txt", 'w')
+
     best_solution_nodes = []
     best_solution_energy = 0
     all_solutions_info = {}
@@ -126,6 +130,8 @@ def calculate_best_solution(
     # we calculate the response, which is saved in a file (if desired), we save the best solution nodes
     # and energy, and we print the best result
     for k, partition in enumerate(partition_with_halo_list):
+        if k+1 < 15:
+            continue
         if(len(partition_with_halo_list) > 1):
             subgraph = stable_set_graph.subgraph(list(partition))
         else:
@@ -137,7 +143,6 @@ def calculate_best_solution(
         for i, j in subgraph.edges:
             Q[(i,j)]+= beta
 
-        
         if(num_of_runs > 1):
             response = sampler.sample_qubo(Q, num_reads=num_of_runs)
         else:
@@ -151,27 +156,40 @@ def calculate_best_solution(
                 with open(output_file, 'wb') as file:
                     pickle.dump(response.to_serializable(), file)
 
-        # this is how you get solution nodes and solution energy from the response
-        solution_nodes = [h for h,v in response.first[0].items() if v == 1]
-        solution_energy = response.first[1]
-
-        all_solutions_info[k] = {
-            "best_solution_nodes": solution_nodes,
-            "best_solution_energy" : solution_energy,
-            "sample_set": response
-        }
+        if(len(response.record) != 0):
+            # this is how you get solution nodes and solution energy from the response
+            solution_nodes = [h for h,v in response.first[0].items() if v == 1]
+            solution_energy = response.first[1]
+            all_solutions_info[k] = {
+                "best_solution_nodes": solution_nodes,
+                "best_solution_energy" : solution_energy,
+                "sample_set": response
+            }
+        else:
+            solution_nodes = []
+            solution_energy = 0
+            all_solutions_info[k] = {
+                "best_solution_nodes": solution_nodes,
+                "best_solution_energy" : solution_energy,
+                "sample_set": response
+            }
         
         if(solution_energy < best_solution_energy):
             best_solution_nodes = solution_nodes
             best_solution_energy = solution_energy
         
         # this is to avoid double printing the result if we choose to calculate response without partitions
+        k_pad = f"{k+1:>{int(math.log(len(partition_with_halo_list),10))+1}}"
+        if(generate_log_file):
+            log_file.write(f"Partition {k_pad}: beta={beta//2} || solution energy: {solution_energy} || number of edges in solution: {len(subgraph.subgraph(solution_nodes).edges)} || solution size: {len(solution_nodes)}\n")
         if(len(partition_with_halo_list) > 1 and console_output):
-            k_pad = f"{k+1:>{int(math.log(len(partition_with_halo_list),10))+1}}"
-            print(f"Partition {k_pad}: beta={beta} || solution energy: {solution_energy} || number of edges in solution: {len(subgraph.subgraph(solution_nodes).edges)} || solution size: {len(solution_nodes)}")
+            print(f"Partition {k_pad}: beta={beta//2} || solution energy: {solution_energy} || number of edges in solution: {len(subgraph.subgraph(solution_nodes).edges)} || solution size: {len(solution_nodes)}")
 
+    if(generate_log_file):
+        log_file.write(f"Best result: beta={beta//2} || best solution energy: {best_solution_energy} || number of edges in best solution: {len(subgraph.subgraph(best_solution_nodes).edges)} || best solution size: {len(best_solution_nodes)}\n")
+        log_file.close()
     if(console_output):
-        print(f"Best result: beta={beta} || best solution energy: {best_solution_energy} || number of edges in best solution: {len(subgraph.subgraph(best_solution_nodes).edges)} || best solution size: {len(best_solution_nodes)}\n")
+        print(f"Best result: beta={beta//2} || best solution energy: {best_solution_energy} || number of edges in best solution: {len(subgraph.subgraph(best_solution_nodes).edges)} || best solution size: {len(best_solution_nodes)}\n")
 
     return all_solutions_info
 
