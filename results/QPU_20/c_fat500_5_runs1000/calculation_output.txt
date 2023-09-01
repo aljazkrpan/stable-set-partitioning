@@ -1,0 +1,9 @@
+Partition 1: solution energy: -53.0 || number of edges in solution: 0 || solution size: 53
+Partition 2: solution energy: -54.0 || number of edges in solution: 0 || solution size: 54
+Partition 3: solution energy: -56.0 || number of edges in solution: 0 || solution size: 56
+Partition 4: solution energy: -54.0 || number of edges in solution: 0 || solution size: 54
+Partition 5: solution energy: -56.0 || number of edges in solution: 0 || solution size: 56
+Partition 6: solution energy: -58.0 || number of edges in solution: 0 || solution size: 58
+Partition 7: solution energy: -57.0 || number of edges in solution: 0 || solution size: 57
+Partition 8: solution energy: -57.0 || number of edges in solution: 0 || solution size: 57
+Best result: best solution energy: -58.0 || number of edges in best solution: 0 || best solution size: 58

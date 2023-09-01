@@ -10,9 +10,6 @@ import dwave
 from collections import defaultdict
 from dimod import SampleSet
 
-from dwave.system.composites import AutoEmbeddingComposite
-from dwave.system.samplers import DWaveSampler
-
 # Reads edge list from the Stable_set_data-main dataset
 def read_edge_list(file_path):
     with open(file_path, 'r') as file:
@@ -33,6 +30,12 @@ def create_networkx_graph(num_nodes, edges):
     G.add_nodes_from(range(0, num_nodes))
     G.add_edges_from(edges)
     return G
+
+# takes a pickeled file and returns the sample_set
+def open_saved_sample_set(input_file):
+    with open(input_file, 'rb') as file:
+        sample_set = SampleSet.from_serializable(pickle.load(file))
+    return sample_set
 
 def calculate_partition_with_halo(
         stable_set_graph,
@@ -175,61 +178,3 @@ def calculate_best_solution(
 
 
 
-all_dense_graph_files = [
-    'Stable_set_data-main/Instances/c_fat_graphs/c_fat200_2_stable_set_edge_list.txt',
-    'Stable_set_data-main/Instances/c_fat_graphs/c_fat500_5_stable_set_edge_list.txt'
-]
-
-all_graph_files = [
-    'Stable_set_data-main/Instances/C_graphs/C125.9_stable_set_edge_list.txt',
-    'Stable_set_data-main/Instances/dsjc_graphs/dsjc125.1_stable_set_edge_list.txt',
-    'Stable_set_data-main/Instances/dsjc_graphs/dsjc125.5_stable_set_edge_list.txt',
-    'Stable_set_data-main/Instances/hamming_graphs/hamming6_2_stable_set_edge_list.txt',
-    'Stable_set_data-main/Instances/hamming_graphs/hamming6_4_stable_set_edge_list.txt',
-    'Stable_set_data-main/Instances/johnson_graphs/johnson8_2_4_stable_set_edge_list.txt',
-    'Stable_set_data-main/Instances/johnson_graphs/johnson8_4_4_stable_set_edge_list.txt',
-    'Stable_set_data-main/Instances/johnson_graphs/johnson16_2_4_stable_set_edge_list.txt',
-    'Stable_set_data-main/Instances/MANN_graphs/MANN_a9_stable_set_edge_list.txt',
-    'Stable_set_data-main/Instances/paley_graphs/paley61_stable_set_edge_list.txt',
-    'Stable_set_data-main/Instances/paley_graphs/paley73_stable_set_edge_list.txt',
-    'Stable_set_data-main/Instances/paley_graphs/paley89_stable_set_edge_list.txt',
-    'Stable_set_data-main/Instances/paley_graphs/paley97_stable_set_edge_list.txt',
-    'Stable_set_data-main/Instances/paley_graphs/paley101_stable_set_edge_list.txt',
-    'Stable_set_data-main/Instances/spin_graphs/spin5_stable_set_edge_list.txt',
-    'Stable_set_data-main/Instances/torus_graphs/torus11_stable_set_edge_list.txt'
-]
-
-
-# example3 just outputs the the CH-partition information for each partition size between 2, ... , max_num_of_part that we get
-# from the METIS algorithm. This works best on dense graphs (those with a lot of edges)
-def example1():
-    # for both graph we print out the best partitions sorted by cost, so that we can decide which one to use
-    global all_dense_graph_files
-    for edge_list_file_path in all_graph_files:
-        num_nodes, edges = read_edge_list(edge_list_file_path)
-        stable_set_graph = create_networkx_graph(num_nodes, edges)
-        print_best_partitions(stable_set_graph, max_num_of_part=len(stable_set_graph.nodes))
-
-# example4 uses suitable partition from the example3 to try to improve the solution.
-def example2():
-    # or if you don't have an account you can replace it with:
-    # sampler = SimulatedAnnealingSampler()
-    #sampler = AutoEmbeddingComposite(DWaveSampler(token="provide_you_token_here"))
-    sampler = AutoEmbeddingComposite(DWaveSampler(token="token"))
-    beta=200
-
-    # for fat200_2, we'll use partition size 9 we got from example3()
-    edge_list_file_path = 'Stable_set_data-main/Instances/c_fat_graphs/c_fat200_2_stable_set_edge_list.txt'
-    num_nodes, edges = read_edge_list(edge_list_file_path)
-    stable_set_graph = create_networkx_graph(num_nodes, edges)
-    #output = "results/example_results/simplified_with_partitions/QPU/c_fat200_2_runs1000/c_fat200_2.pkl"
-    output = "results/c_fat_200_2"
-    solution = calculate_best_solution(stable_set_graph, sampler, beta=beta, output_file=output, num_of_part=9, num_of_runs=1000)
-
-    # for fat500_5, we'll use partition size 8 we got from example3()
-    edge_list_file_path = 'Stable_set_data-main/Instances/c_fat_graphs/c_fat500_5_stable_set_edge_list.txt'
-    num_nodes, edges = read_edge_list(edge_list_file_path)
-    stable_set_graph = create_networkx_graph(num_nodes, edges)
-    #output = "results/example_results/simplified_with_partitions/QPU/c_fat500_5_runs1000/c_fat500_5.pkl"
-    output = "results/c_fat_500_5"
-    solution = calculate_best_solution(stable_set_graph, sampler, beta=beta, output_file=output, num_of_part=8, num_of_runs=1000)

@@ -1,0 +1,1 @@
+{'qpu_access_time': 111112, 'charge_time': 2996173, 'run_time': 2996173, 'problem_id': '414371b4-3f37-452d-b3a6-f71ccf4d6231'}
